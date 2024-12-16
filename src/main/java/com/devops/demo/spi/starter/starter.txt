@@ -1,0 +1,28 @@
+start module---依赖----->第三方Jar[spring-data-redis]
+
+[spring-boot-starter-data-redis]   
+
+
+autoconfigure module ( 自动配置类， 配置文件spring.factories, 自定义的配置项)
+
+[spring-boot-autoconfigure]
+
+
+1.redis自动配置类:  RedisAutoConfiguration, RedisReactiveAutoconfiguration, RedisRepositoriesAutoConfiguration
+
+
+2. 配置文件spring.factories: orf.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,\
+org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration,\
+org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+3. 自定义的配置项: redis的连接参数
+
+
+--------------------------实例---------------------------
+在SpringCloud中，营销微服务ms-marketing需要调用用户微服务ms-user
+通过用户ID来获取用户的基本信息
+
+
+
+

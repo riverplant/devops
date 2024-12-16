@@ -8,6 +8,13 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
+		
+//		ServiceLoader<InternetService> loader = 
+//				ServiceLoader.load(InternetService.class);
+//		
+//		for(InternetService provider : loader) {
+//			provider.connectInternet();
+//		}
 	}
 
 }

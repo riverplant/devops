@@ -1,0 +1,200 @@
+Spring Framework 6.x 要求
+
+Jakarta EE 9+ Baseline
+
+LTS
+
+
+1. switch加强：
+
+String result = switch (obj) {
+    case Integer i -> "Integer: " + i;
+    case String s -> "String: " + s;
+    default -> "Unknown";
+};
+
+
+
+String name = "徐蔗";
+String country = switch(name){
+
+  case "徐蔗","周瑜" -> "三国";
+  case "项羽","刘邦" -> "汉朝";
+
+   default -> "未知";
+}
+
+
+//多行逻辑
+
+String country = switch(name){
+
+  case "徐蔗","周瑜" -> {
+      System.out.println("三国");
+      yield "三国"; //使用yield关键字返回
+  }
+   case "项羽","刘邦" -> {
+      System.out.println("汉朝");
+      yield "汉朝"; //使用yield关键字返回
+  }
+   default ->{
+	   System.out.println("未知");
+	   yield "未知";
+   } 
+}
+
+
+
+instanceof 增强
+Object o = 1;
+
+---------------------------密封类 Sealed Classes!!!!!!!--------------------------
+
+Sealed: 用来修饰父类或者虚拟类或者接口!!!!!!!!
+
+Sealed类和所有的子类必须在同一个包下
+
+Sealed类的继承类必须是final(无法再被继承)或者是non-sealed类（可以再被其它类继承）
+
+Sealed的好处：
+   安全，限制继承
+   可控， 限制范围，只能在同一个包
+   易于维护
+   
+   
+Record类，类似于lombok的属性只读对象
+
+优化空指针异常信息:--------------------------------------------------------------
+
+
+
+ZGC垃圾收集器(默认使用G1)---------------------------------------------------------------
+-XX:+UseZGC
+
+
+
+--------------------Springboot 3------------------------------------------------------
+JDK17
+1. spring.factories文件不再被使用来做外部的自动配置文件
+--------ImportCandidates load
+改成了/META-INF/spring/org.springframework.boot
+       .autoconfigure.AutoConfiguration.imports文件
+       
+2. Spring Native:  通过GraalVM将SpringBoot编译成本地可执行的镜像文件
+生成.exe
+
+  安装 GraalVM：
+
+  下载并安装适合你系统的 GraalVM。
+  确保 GraalVM 的路径在 PATH 中。
+  
+  配置 Native Image 工具
+   gu install native-image
+   
+   在项目中添加支持：
+
+   在 pom.xml 中添加 spring-aot-maven-plugin 和 native-maven-plugin。  
+   
+   <build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.experimental</groupId>
+            <artifactId>spring-aot-maven-plugin</artifactId>
+            <version>0.13.0</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>process-aot</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>native-image-maven-plugin</artifactId>
+            <version>1.0.0-rc16</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>native-image</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+   
+
+编译为可执行文件：
+
+运行以下命令：
+mvn clean package -Pnative
+
+生成的 .exe 文件将位于 target 文件夹中
+
+
+javax --> jakarta:
+
+-----------------------SPI-------------------------------------------
+SPI： Service Provider Interface:是一种基于ClassLoader来发现并且加载服务
+
+  1. Service
+    公开的接口或者抽象类，定义了一个抽象的功能模块
+  2. Service Provider
+    Service接口的实现类
+  3. ServiceLoader：核心组件，在运行时发现并且加载Service Provider
+规范的配置文件:
+  4. 文件路径必须在JAR包中的META-INF/services目录下
+
+例如在mysql-connector-java-8.0.28.jar解压后：
+ 在META-INF/services目录下查看java.sql.Driver文件: com.mysql.cj.jdbc.Driver
+ 
+ Service Provider类必须具备无参的默认构造方法，因为随后通过反射实例化它，是不带参数的
+ 保证能加载到配置文件和Service Provider类：
+  1. 将Service Provider的JAR放在classpath中(通过Maven导入JAR包)
+ 
+  
+例如： JDBC
+
+------------------------------Springboot自动配置---------------------------
+1. 使用约定的配置文件：
+   META-INFO/spring.factories
+   key=valu1,value2....valueN
+   key是"EnalbeAutoConfiguration"的类名
+   value是自动配置类的类名
+   
+2. 谁提供Jar包，也同时提供配置文件 META-INFO/spring.factories
+
+3. 使用ClassLoader.getResource来读取classpath中的配置文件
+   通过SpringFactoriesLoader返回一个类名的集合
+
+----------------------------Springboot启动--------------------------
+//创建ApplicationContext实例，就是IOC容器
+1. ApplicationContext context = createApplicationContext();
+
+//将主类(primaryClass)注册到IOC中Main()
+loadSourceClass(context, primaryClass);
+
+//递归加载并处理所有的配置类
+processConfigurationClasses(context);
+
+//实例化所有的单例Bean
+instantiateSingletonBeans(context);
+
+//启动web服务器
+startWebServer(context);
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+

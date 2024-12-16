@@ -1,0 +1,57 @@
+Application simple-company
+
+Service simple-api
+
+
+Service Provider:  simple-isp-mobile(implements simple-api)
+                   simple-isp-unicom(implements simple-api)
+                   
+
+1. 创建一个工程simple-api, 创建一个interface 
+public interface InternetService {
+
+	void connectInternet();
+}
+
+2.创建一个工程simple-isp-mobile，通过maven引入InternetService接口
+
+创建一个service provider类BeijingChinaMobile实现接口
+public  class BeijingChinaMobile implements InternetService{
+
+	@Override
+	public void connectInternet() {
+		System.out.println("connect internet by [Beijing China Mobile]");
+		
+	}
+
+}
+
+在目录resources/META-INF.service/下创建com.devops.demo.spi.InternetService.properties
+里面写上com.devops.demo.spi.BeijingChinaMobile
+
+3. 创建一个工程simple-isp-unicom，通过maven引入InternetService接口
+
+创建一个service provider类ChinaUnicom实现接口
+public  class ChinaUnicom implements InternetService{
+
+	@Override
+	public void connectInternet() {
+		System.out.println("connect internet by [ChinaUnicom]");
+		
+	}
+
+}
+
+在目录resources/META-INF.service/下创建com.devops.demo.spi.InternetService.properties
+里面写上com.devops.demo.spi.ChinaUnicom
+
+
+4. 最后创建一个项目simple-company，通过maven引入simple-isp-unicom或者simple-isp-mobil
+   通过ServiceLoader发现并且加载服务然后调用
+   		ServiceLoader<InternetService> loader = 
+				ServiceLoader.load(InternetService.class);
+		
+		for(InternetService provider : loader) {
+			provider.connectInternet();
+		}
+
